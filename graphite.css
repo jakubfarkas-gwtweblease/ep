@@ -1,0 +1,46 @@
+
+/* Graphite visual theme — deliberately separate from application behavior.
+   Preserves all V4 storage keys and interaction logic. */
+:root {color:#f2f3f5;background:#171a1f;--bg:#171a1f;--text:#f2f3f5;--muted:#a8adb5;--accent:#c5cbd4;--accent-light:#eff1f4;--card:rgba(71,78,89,.44);--border:rgba(224,230,239,.16)}
+html{background:#171a1f}
+.app-shell{background:radial-gradient(ellipse 80% 55% at 25% 90%,rgba(75,85,100,.20),transparent 70%),radial-gradient(ellipse 70% 45% at 88% 40%,rgba(73,79,90,.10),transparent 76%),linear-gradient(165deg,#15171a,#22262d 65%,#252a31)}
+.ocean-image{filter:grayscale(1) brightness(.72) contrast(1.05);opacity:.67}
+.today-eyebrow{color:#e1e4e9}.date-heading h1{color:#e9edf2}.weekday-heading{color:#eef0f3}
+.discipline-ring{background:conic-gradient(from -90deg,#aeb7c5 0deg,#f8fafc var(--angle),rgba(225,234,246,.17) var(--angle),rgba(225,234,246,.17) 360deg);filter:drop-shadow(0 0 7px rgba(239,243,252,.04))}
+.discipline-ring::before{background:#1b1e23}.ring-center strong{color:#f0f1f3}.ring-center>span{color:#d6d8dc}
+.week-arrow{color:#e2e5ea}.day-button{color:#bfc3cc}
+.day-button.active{background:linear-gradient(150deg,#9198a5,#59616e);color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.17)}
+.day-button.has-items:not(.active) .day-number::after{background:#bdc1c9}.day-button.is-today:not(.active) .day-number::before{background:#d2d6df}
+.quote-mark{color:#c3c9d3}.quote p{color:#cfd4dc}
+.section-header h2,.section-header span{color:#edf0f3}
+.habit-pill{background:rgba(88,94,104,.3);border-color:rgba(212,219,232,.14);color:#edf0f4}
+.habit-pill:has(.checked){background:rgba(103,109,119,.31)}
+.check-circle{border-color:#d1d5dc;color:#252a32}.check-circle.checked{background:linear-gradient(145deg,#eef0f5,#a2acba);border-color:transparent;color:#292c33}
+.task-swipe-track{background:linear-gradient(135deg,#424852,#242b33)}
+.task-row{border-color:rgba(222,228,239,.13);background:linear-gradient(100deg,#343942,#363b46)}
+.task-text{color:#f3f5f7}.task-meta{color:#c1c5cd}
+.delete-action{background:linear-gradient(140deg,#7c858f,#4f5762);color:white}
+.add-fab{border-color:rgba(240,244,252,.53);background:linear-gradient(145deg,#d0d4dc,#737b88);color:#fff;box-shadow:0 9px 26px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.26)}
+.modal-scrim.is-visible{background:rgba(5,7,10,.72)}
+.modal-sheet{border-color:rgba(205,213,226,.2);background:linear-gradient(154deg,#30363e,#1b2026 84%)}
+.sheet-handle{background:rgba(223,229,240,.37)}.icon-close{border-color:rgba(210,218,229,.14);background:rgba(228,233,242,.08);color:#f4f6f8}
+.type-choice{color:#c4cad3}.type-choice.active{background:#bcc3cd;color:#202630}
+#itemForm input,#itemForm select,#quickTitleInput{border-color:rgba(216,221,230,.2);color:#eef0f5}
+#itemForm select option{background:#2d333c}
+.reschedule-options button{border-color:rgba(210,219,230,.2);background:rgba(198,206,217,.1);color:#f0f2f6}
+.reschedule-options button.active{color:#222730;background:linear-gradient(120deg,#e0e4ec,#a4acb9)}
+.weekday-toggle{border-color:rgba(212,219,230,.2);color:#dbe1e9}.weekday-toggle.active{background:#aeb7c4;color:#252b34}
+.form-actions{border-color:rgba(212,219,230,.13);background:#242932}.save-button{background:linear-gradient(120deg,#d9dee8,#a3acbb);color:#222831}
+.danger-text{color:#d5d8df}.stat-card{border-color:rgba(216,225,237,.13);background:rgba(112,119,133,.16)}
+.chart-fill{background:linear-gradient(#eff1f5,#a6afbd)}.data-actions button{border-color:rgba(214,221,234,.2);background:rgba(155,167,183,.12);color:#e5e9ef}
+.reset-button{color:#c9d0d9}.toast{background:rgba(226,231,240,.97);color:#222831}.toast-undo{color:#474e5b}
+.jump-today{border-color:rgba(217,226,238,.2);background:rgba(214,219,230,.13);color:#e0e5ed}
+.task-context{border-color:rgba(210,220,235,.23);background:rgba(37,43,51,.98)}
+.task-context button{color:#f4f6f9}.task-context button:active{background:rgba(206,217,231,.14)}
+.quick-presets button{border-color:rgba(213,220,233,.17);color:#cfd6df}.quick-presets button.active{background:rgba(216,227,242,.18);border-color:rgba(230,238,247,.43);color:#fff}
+#quickTime{border-color:rgba(210,220,230,.19);background:#343a45;color:#f0f3f7}.quiet-button{color:#d6dbe3}
+.pause-settings{border-color:rgba(208,220,232,.14)}.pause-add{border-color:rgba(212,224,239,.22);background:rgba(192,206,225,.12);color:#e2e7ef}
+.pause-row button{color:#d2d8e1}.heatmap-day.great{background:#c3cbd6;color:#252b35}.heatmap-day.good{background:#919baa}.heatmap-day.some{background:#626c78}.heatmap-day.low{background:#404650;color:#e1e5ed}.heatmap-day.empty{color:#999fa9}
+.streak-row{background:rgba(200,212,226,.08);color:#e5e8ed}.setting-line{border-color:rgba(215,225,236,.13);background:rgba(188,198,214,.07)}
+.trash-row button{border-color:rgba(211,225,239,.21);background:rgba(186,201,221,.12);color:#e4eaf3}
+@media(hover:hover) and (pointer:fine){.task-row:hover{background:#424854}.habit-pill:hover{border-color:rgba(226,233,244,.29)}.day-button:not(.active):hover{background:rgba(230,237,250,.09)}}

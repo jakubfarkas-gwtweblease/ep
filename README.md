@@ -1,3 +1,26 @@
+# Graphite Discipline — V6 (selected calendar + check icon)
+
+This is a **complete ready-to-deploy Graphite version** of the habits/calendar app. It retains the V4 behaviors and V5 graphite color scheme, and replaces the Home Screen icon with the user's selected metallic silver calendar/checkmark artwork. The original image was cropped into a clean square and exported to high-quality 180, 192, 512, 1024 and 2048 px PNG files.
+
+## Install on iPhone
+
+1. Upload all ZIP contents into the **root of the same repository** that currently hosts the app (do not upload the containing folder).
+2. Allow GitHub Pages to finish publishing, then open the published URL in **Safari**.
+3. Tap **Share → Add to Home Screen → Add**. The calendar/checkmark icon is provided via `apple-touch-icon` (iOS) and the web app manifest.
+4. If you previously installed the app using its old icon, the iPhone may cache it: remove the old Home Screen shortcut and add it again after the site updates. **Export your planner's JSON backup first** and import it if your data does not carry over.
+
+## Data and limitations
+
+Task/habit data still uses the `coral-discipline-v1` localStorage key, with no account and no cloud sync. Updating the files at the same URL ordinarily keeps data intact, but removal/reinstallation of a Home Screen web app or clearing website data can erase locally stored records. Back up your data before changing the installation. Background/lock-screen scheduled notifications are not provided by this static app.
+
+---
+
+# Graphite Discipline — Theme Preview (V5)
+
+Graphite visual treatment of Coral Discipline V4, with all scheduling, habit, stats, offline and storage features preserved. Includes a custom graphite app icon, updated manifest, monochrome ocean artwork treatment, and graphite styling for all bottom sheets and menus. This is a **complete project variant**, not a theme-only patch.
+
+**Important:** This version shares the prior localStorage key; deploy at the same URL to retain existing data. Export a backup before changing site or app install context. Background notifications are still not available with the current local-only architecture.
+
 # Coral Discipline — Version 4
 
 A refined, offline-first iPhone-style habits and daily calendar web app. Deep plum / coral-pink color palette, translucent cards, a delicate serif date header, and a local sunset-ocean background. **No server, account, cloud database, dependencies, analytics, or subscription.**
