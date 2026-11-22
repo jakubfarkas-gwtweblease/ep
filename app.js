@@ -11,6 +11,9 @@
   let editingId = null;
   let customDays = new Set([dayIndex(selectedDate)]);
   let toastTimer;
+  let modalTimer;
+  let undoDeletion = null;
+  let suppressNextSwipeClick = false;
 
   function isoDate(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
   function parseDate(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d, 12); }
@@ -100,11 +103,15 @@
     $('todayEyebrow').textContent = selectedDate === today ? 'Today' : 'Selected day';
     $('largeDate').textContent = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     $('weekdayHeading').textContent = date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+    updateIndicators();
+    renderWeek(); renderHabits(); renderTasks();
+  }
+  function updateIndicators() {
     const score = dailyStats(selectedDate);
     $('dailyPercent').textContent = `${score.percent}%`;
-    $('disciplineRing').style.setProperty('--progress', String(score.percent));
     $('disciplineRing').style.setProperty('--angle', `${score.percent * 3.6}deg`);
-    renderWeek(); renderHabits(); renderTasks();
+    $('habitCount').textContent = `${score.completeHabits} / ${score.habitsCount}`;
+    $('taskCount').textContent = `${score.tasksCount} ${selectedDate === today ? 'TODAY' : 'TASKS'}`;
   }
   function renderWeek() {
     const start = weekStart(selectedDate);
@@ -138,23 +145,56 @@
     }).join('') : '<p class="task-empty">A clear day. Add your first task with +</p>';
     $('tasksList').querySelectorAll('.task-swipe-track').forEach(installSwipe);
   }
-  function selectDate(date) { selectedDate = date; render(); }
-  function toggleTask(id) {
-    const item = state.tasks.find(t => t.id === id);
-    if (item) { item.completed = !item.completed; saveState(); render(); }
+  function selectDate(date) {
+    if (date === selectedDate) return;
+    selectedDate = date; render();
+    const content = $('app');
+    content.classList.remove('animate-day');
+    void content.offsetWidth;
+    content.classList.add('animate-day');
   }
-  function toggleHabit(id) {
+  // Update only the checkmark and ring when an item is tapped. Rebuilding the
+  // entire list on every tap felt laggy and caused gesture targets to disappear.
+  function updateCheck(control, checked, title) {
+    if (!control) return;
+    control.classList.toggle('checked', checked);
+    control.textContent = checked ? '✓' : '';
+    control.setAttribute('aria-label', `${checked ? 'Uncheck' : 'Complete'} ${title}`);
+    if (checked) { control.classList.remove('just-checked'); void control.offsetWidth; control.classList.add('just-checked'); }
+  }
+  function toggleTask(id, control) {
+    const item = state.tasks.find(t => t.id === id);
+    if (!item) return;
+    item.completed = !item.completed;
+    updateCheck(control, item.completed, item.title);
+    saveState(); updateIndicators();
+  }
+  function toggleHabit(id, control) {
     const item = state.habits.find(h => h.id === id);
     if (!item) return;
     if (!item.completedDates) item.completedDates = {};
     if (item.completedDates[selectedDate]) delete item.completedDates[selectedDate];
     else item.completedDates[selectedDate] = true;
-    saveState(); render();
+    updateCheck(control, !!item.completedDates[selectedDate], item.title);
+    saveState(); updateIndicators();
   }
   function deleteItem(type, id) {
-    if (type === 'task') state.tasks = state.tasks.filter(t => t.id !== id);
-    else state.habits = state.habits.filter(h => h.id !== id);
-    saveState(); closeAll(); render(); toast(type === 'task' ? 'Task deleted' : 'Habit deleted');
+    const collection = type === 'task' ? state.tasks : state.habits;
+    const index = collection.findIndex(t => t.id === id);
+    if (index === -1) return;
+    const saved = collection[index];
+    collection.splice(index, 1);
+    undoDeletion = { type, item: saved, index };
+    saveState(); closeAll(); render();
+    toast(type === 'task' ? 'Task deleted' : 'Habit deleted', true);
+  }
+  function undoDelete() {
+    if (!undoDeletion) return;
+    const { type, item, index } = undoDeletion;
+    const collection = type === 'task' ? state.tasks : state.habits;
+    if (!collection.some(x => x.id === item.id)) collection.splice(Math.min(index, collection.length), 0, item);
+    undoDeletion = null;
+    saveState(); render(); toast('Restored');
   }
   function installSwipe(track) {
     const row = track.querySelector('.task-row');
@@ -173,13 +213,15 @@
       isMoving = true;
       e.preventDefault();
       row.classList.add('swiping');
-      distance = Math.max(-88, Math.min(0, dx + (startingOpen ? -88 : 0)));
-      row.style.transform = `translateX(${distance}px)`;
+      distance = Math.max(-76, Math.min(0, dx + (startingOpen ? -76 : 0)));
+      row.style.transform = `translate3d(${distance}px,0,0)`;
     }, { passive: false });
     track.addEventListener('touchend', () => {
       if (!isMoving) return;
       row.classList.remove('swiping'); row.style.transform = '';
-      row.classList.toggle('is-open', distance < -44);
+      row.classList.toggle('is-open', distance < -39);
+      suppressNextSwipeClick = true;
+      setTimeout(() => { suppressNextSwipeClick = false; }, 60);
       isMoving = false;
     });
     // Desktop drag preview. The listener is short-lived to avoid leaks on re-render.
@@ -193,14 +235,42 @@
     });
   }
 
-  function showModal(id) { $(id).hidden = false; document.body.style.overflow = 'hidden'; }
-  function closeAll() { $('editorModal').hidden = true; $('statsModal').hidden = true; document.body.style.overflow = ''; }
+  function showModal(id) {
+    clearTimeout(modalTimer);
+    for (const name of ['editorModal','statsModal']) { $(name).hidden = name !== id; $(name).classList.remove('is-visible'); }
+    document.body.style.overflow = 'hidden';
+    $('addButton').setAttribute('aria-expanded', 'true');
+    requestAnimationFrame(() => requestAnimationFrame(() => $(id).classList.add('is-visible')));
+  }
+  function closeAll() {
+    const active = ['editorModal','statsModal'].map($).find(el => !el.hidden);
+    if (!active) return;
+    active.classList.remove('is-visible');
+    $('addButton').setAttribute('aria-expanded', 'false');
+    clearTimeout(modalTimer);
+    modalTimer = setTimeout(() => { active.hidden = true; document.body.style.overflow = ''; }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 290);
+    if (document.activeElement?.closest('.modal-sheet')) document.activeElement.blur();
+  }
+  // The keyboard changes the VISUAL viewport on iOS, but not always 100dvh.
+  // Keeping the sheet above it avoids large jumps and obscured save buttons.
+  function syncVisualViewport() {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const keyboard = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+    document.documentElement.style.setProperty('--keyboard-offset', `${Math.round(keyboard)}px`);
+    document.documentElement.style.setProperty('--visible-height', `${Math.round(viewport.height)}px`);
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncVisualViewport, { passive: true });
+    window.visualViewport.addEventListener('scroll', syncVisualViewport, { passive: true });
+    syncVisualViewport();
+  }
   function setType(type) {
     currentType = type;
     $('typeTask').classList.toggle('active', type === 'task');
     $('typeHabit').classList.toggle('active', type === 'habit');
     $('taskFields').hidden = type === 'habit';
-    $('taskOptionalFields').hidden = type === 'habit';
+    $('taskExtraDetails').hidden = type === 'habit';
     $('rescheduleTools').hidden = type !== 'task' || !editingId;
     $('habitFields').hidden = type !== 'habit';
     $('itemDate').required = type === 'task';
@@ -224,6 +294,9 @@
     editingId = id;
     const existing = id ? (type === 'task' ? state.tasks : state.habits).find(item => item.id === id) : null;
     $('itemForm').reset();
+    $('itemForm').scrollTop = 0;
+    $('taskExtraDetails').open = false;
+    $('itemTypeSwitch').hidden = !!id;
     $('editorTitle').textContent = id ? (type === 'task' ? 'Edit task' : 'Edit habit') : 'New item';
     $('itemTitle').value = existing?.title || '';
     $('itemDate').value = existing?.date || selectedDate;
@@ -239,7 +312,7 @@
     $('typeTask').disabled = !!id; $('typeHabit').disabled = !!id;
     $('deleteFromEditor').hidden = !id;
     showModal('editorModal');
-    setTimeout(() => $('itemTitle').focus(), 100);
+    // Do not auto-focus: opening the iOS keyboard immediately made the sheet jump.
   }
   function submitEditor(event) {
     event.preventDefault();
@@ -287,7 +360,21 @@
     $('milestones').textContent = `🔥 ${days}-day perfect streak · ✓ ${totalCompleted} total completions · ${days >= 7 ? '🏆 7-day consistency unlocked' : 'Reach 7 perfect days for your first streak award'} · ${totalCompleted >= 50 ? '🏅 50 completions unlocked' : 'Reach 50 completions for a milestone'}`;
     showModal('statsModal');
   }
-  function toast(message) { clearTimeout(toastTimer); $('toast').textContent = message; $('toast').hidden = false; toastTimer = setTimeout(() => $('toast').hidden = true, 2600); }
+  function toast(message, offerUndo = false) {
+    clearTimeout(toastTimer);
+    const container = $('toast');
+    container.replaceChildren(document.createTextNode(message));
+    if (offerUndo) {
+      const action = document.createElement('button');
+      action.textContent = ' Undo';
+      action.type = 'button';
+      action.className = 'toast-undo';
+      action.addEventListener('click', undoDelete, { once: true });
+      container.append(action);
+    }
+    container.hidden = false;
+    toastTimer = setTimeout(() => { container.hidden = true; undoDeletion = null; }, offerUndo ? 4800 : 2100);
+  }
   function downloadBackup() {
     const blob = new Blob([JSON.stringify({ ...state, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -329,15 +416,18 @@
     weekTouch = null;
   });
   $('habitsList').addEventListener('click', e => {
-    const toggle = e.target.closest('[data-toggle-habit]'); if (toggle) return toggleHabit(toggle.dataset.toggleHabit);
+    const toggle = e.target.closest('[data-toggle-habit]'); if (toggle) return toggleHabit(toggle.dataset.toggleHabit, toggle);
     const edit = e.target.closest('[data-edit-habit]'); if (edit) return openEditor('habit', edit.dataset.editHabit);
   });
   $('tasksList').addEventListener('click', e => {
+    if (suppressNextSwipeClick) { e.preventDefault(); return; }
     const remove = e.target.closest('[data-delete-task]'); if (remove) return deleteItem('task', remove.dataset.deleteTask);
-    const toggle = e.target.closest('[data-toggle-task]'); if (toggle) return toggleTask(toggle.dataset.toggleTask);
+    const toggle = e.target.closest('[data-toggle-task]'); if (toggle) return toggleTask(toggle.dataset.toggleTask, toggle);
     const edit = e.target.closest('[data-edit-task]'); if (edit) return openEditor('task', edit.dataset.editTask);
   });
   $('addButton').addEventListener('click', () => openEditor());
+  $('todayEyebrow').addEventListener('click', () => selectDate(today));
+  $('todayEyebrow').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectDate(today); } });
   $('disciplineButton').addEventListener('click', openStats);
   document.querySelectorAll('[data-close-modal]').forEach(b => b.addEventListener('click', closeAll));
   document.querySelectorAll('.modal-scrim').forEach(modal => modal.addEventListener('click', e => { if (e.target === modal) closeAll(); }));
@@ -369,8 +459,32 @@
     populateWeekdays();
   });
   $('itemForm').addEventListener('submit', submitEditor);
+  // Pull the small sheet handle down to dismiss, as with a native iOS sheet.
+  document.querySelectorAll('.sheet-handle').forEach(handle => {
+    let startY, travel, sheet;
+    handle.addEventListener('pointerdown', e => {
+      startY = e.clientY; travel = 0; sheet = handle.closest('.modal-sheet');
+      handle.setPointerCapture?.(e.pointerId);
+      sheet.classList.add('is-dragging');
+    });
+    handle.addEventListener('pointermove', e => {
+      if (startY == null) return;
+      travel = Math.max(0, e.clientY - startY);
+      sheet.style.transform = `translate3d(0,${travel}px,0)`;
+    });
+    const stop = () => {
+      if (startY == null) return;
+      sheet.style.transform = '';
+      sheet.classList.remove('is-dragging');
+      startY = null;
+      if (travel > 85) closeAll();
+    };
+    handle.addEventListener('pointerup', stop);
+    handle.addEventListener('pointercancel', stop);
+  });
   $('deleteFromEditor').addEventListener('click', () => {
-    if (!editingId || !confirm(`Delete this ${currentType}?`)) return;
+    if (!editingId) return;
+    // An undoable action is quicker and less disruptive than a browser alert.
     deleteItem(currentType, editingId);
   });
   $('exportData').addEventListener('click', downloadBackup);

@@ -1,5 +1,5 @@
 /* Small, versioned app-shell cache. Data remains in localStorage, never the service worker. */
-const CACHE = 'coral-discipline-shell-v2';
+const CACHE = 'coral-discipline-shell-v3';
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './assets/ocean.webp', './assets/icon-192.png', './assets/icon-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
