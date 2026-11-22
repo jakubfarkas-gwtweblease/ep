@@ -38,6 +38,7 @@
         <div class="week-dates" id="weekDates" aria-live="polite"></div>
         <button class="week-arrow" id="nextWeek" type="button" aria-label="Next week">›</button>
       </nav>
+      <button type="button" id="jumpToday" class="jump-today" hidden>↶ Back to today</button>
 
       <section class="quote" aria-label="Motivational thought">
         <span class="quote-mark" aria-hidden="true">“</span>
@@ -62,6 +63,35 @@
       <div class="bottom-breathing-room"></div>
     </main>
     <button class="add-fab" id="addButton" type="button" aria-label="Add task or habit"><span aria-hidden="true">+</span></button>
+  </div>
+
+
+  <div class="modal-scrim" id="quickModal" hidden>
+    <section class="modal-sheet quick-sheet" role="dialog" aria-modal="true" aria-labelledby="quickTitle">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-title-row"><h2 id="quickTitle">A fresh intention</h2><button type="button" class="icon-close" data-close-modal aria-label="Close">×</button></div>
+      <form id="quickForm" autocomplete="off">
+        <div class="type-switch" role="group" aria-label="Create item type">
+          <button type="button" id="quickTask" class="type-choice active">Task</button>
+          <button type="button" id="quickHabit" class="type-choice">Habit</button>
+        </div>
+        <label class="sr-only" for="quickTitleInput">Task or habit name</label>
+        <input id="quickTitleInput" type="text" maxlength="100" required placeholder="What do you want to do?" />
+        <div id="quickSchedule" class="quick-schedule">
+          <div class="quick-presets" role="group" aria-label="Task date">
+            <button type="button" id="quickSelected" class="active">Selected day</button>
+            <button type="button" id="quickTomorrow">Tomorrow</button>
+            <button type="button" id="quickTimeToggle">+ Time</button>
+          </div>
+          <label class="quick-time-label" id="quickTimeWrap" hidden>Time <input type="time" id="quickTime" /></label>
+        </div>
+        <p class="quick-habit-note" id="quickHabitNote" hidden>Repeats every day · customize the schedule in More options</p>
+        <div class="quick-actions">
+          <button type="button" id="quickMore" class="quiet-button">More options</button>
+          <button type="submit" class="save-button" id="quickSave">Add task</button>
+        </div>
+      </form>
+    </section>
   </div>
 
   <div class="modal-scrim" id="editorModal" hidden>
@@ -93,6 +123,9 @@
           <div class="field-col"><label class="field-label" for="itemCategory">CATEGORY</label><select id="itemCategory" name="category"><option value="PERSONAL">Personal</option><option value="FOCUS">Focus</option><option value="WORK">Work</option><option value="HOME">Home</option><option value="WELLNESS">Wellness</option><option value="OTHER">Other</option></select></div>
           <div class="field-col"><label class="field-label" for="itemDuration">DURATION (MIN)</label><input id="itemDuration" name="duration" inputmode="numeric" type="number" min="0" max="1440" step="5" placeholder="Optional" /></div>
         </div>
+          <label class="field-label" for="itemReminder">REMIND ME (APP OPEN)</label>
+          <select id="itemReminder" name="reminder"><option value="0">No reminder</option><option value="5">5 minutes before</option><option value="15">15 minutes before</option><option value="30">30 minutes before</option><option value="60">1 hour before</option></select>
+          <p class="reminder-hint">In-app alerts appear only while Coral Discipline is open. Background notifications need a future push service.</p>
         </details>
         <div id="habitFields" hidden>
           <label class="field-label" for="habitStart">FIRST DAY</label>
@@ -100,6 +133,12 @@
           <label class="field-label" for="habitFrequency">REPEAT</label>
           <select id="habitFrequency" name="frequency"><option value="daily">Every day</option><option value="weekly">Once a week</option><option value="custom">Custom weekdays</option></select>
           <div id="weekdayPicker" class="weekday-picker" hidden aria-label="Choose repeat weekdays"></div>
+          <div id="pauseSettings" class="pause-settings" hidden>
+            <div class="pause-head"><span>REST DAYS / VACATION</span><span>Skipped, not failed</span></div>
+            <div class="field-row"><div class="field-col"><label class="field-label" for="pauseFrom">FROM</label><input id="pauseFrom" type="date" /></div><div class="field-col"><label class="field-label" for="pauseUntil">UNTIL</label><input id="pauseUntil" type="date" /></div></div>
+            <button type="button" class="pause-add" id="addPause">+ Add pause</button>
+            <div id="pausesList" class="pauses-list"></div>
+          </div>
         </div>
         <div class="form-actions">
           <button type="button" class="danger-text" id="deleteFromEditor" hidden>Delete</button>
@@ -116,16 +155,37 @@
       <div class="stats-grid" id="statsGrid"></div>
       <div class="stats-scroll"><h3 class="stats-subtitle">Past 7 days</h3>
       <div class="week-chart" id="weekChart"></div>
+      <h3 class="stats-subtitle">This month <span class="month-label" id="monthLabel"></span></h3>
+      <div class="heatmap-weekdays"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+      <div class="month-heatmap" id="monthHeatmap" aria-label="Monthly discipline calendar"></div>
+      <p class="stats-footnote" id="statsSummary"></p>
+      <h3 class="stats-subtitle">Habit streaks</h3>
+      <div id="habitStreakList" class="habit-streak-list"></div>
       <h3 class="stats-subtitle">Milestones</h3>
       <p class="milestones" id="milestones"></p>
+      <h3 class="stats-subtitle">Your settings</h3>
+      <label class="setting-line"><span><strong>In-app reminders</strong><small>Show a reminder while the app is open</small></span><input id="remindersEnabled" type="checkbox" checked /></label>
+      <div class="recently-deleted-head"><h3 class="stats-subtitle">Recently deleted</h3><small>Restore for up to 30 days</small></div>
+      <div id="trashList" class="trash-list"></div>
       <div class="data-actions">
         <button type="button" id="exportData">Export backup</button>
         <button type="button" id="importData">Import backup</button>
         <input type="file" id="importFile" accept="application/json,.json" hidden />
       </div>
+      <p class="privacy-note" id="storageStatus"></p>
       <p class="privacy-note">Private by design. Everything stays on this device unless you export a backup. Clearing browser data may erase your planner.</p>
       <button type="button" class="reset-button" id="resetData">Reset planner</button></div>
     </section>
+  </div>
+
+  <div class="context-backdrop" id="contextBackdrop" hidden></div>
+  <div class="task-context" id="taskContext" role="menu" aria-label="Task actions" hidden>
+    <p class="context-title" id="contextTitle"></p>
+    <button type="button" data-context="tomorrow" role="menuitem">↗ Move to tomorrow</button>
+    <button type="button" data-context="next-week" role="menuitem">▦ Move to next week</button>
+    <button type="button" data-context="custom" role="menuitem">◷ Choose date &amp; time</button>
+    <button type="button" data-context="complete" id="contextComplete" role="menuitem">✓ Mark complete</button>
+    <button type="button" data-context="delete" class="context-danger" role="menuitem">Delete task</button>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

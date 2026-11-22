@@ -178,3 +178,86 @@ button, .day-button, .habit-pill { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; transition-duration:.01ms !important; animation-duration:.01ms !important; } }
 
 .toast-undo { padding: 4px 0 4px 9px; border: 0; background: transparent; color: #8c244e; font-weight: 750; text-decoration: underline; }
+
+/* ───────── Coral Discipline V4: restrained iOS-style interaction polish ───────── */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.jump-today{display:block;width:max-content;margin:8px auto -10px;border:1px solid rgba(255,177,191,.19);border-radius:99px;background:rgba(244,103,144,.11);color:#ffc2cf;padding:7px 13px;font-size:11px;letter-spacing:.25px;transition:transform .2s var(--spring),background .2s;}
+.jump-today:active{transform:scale(.95)}
+/* A long press opens a floating mini menu; the backdrop is transparent to keep context. */
+.context-backdrop{position:fixed;inset:0;z-index:26;background:rgba(8,3,12,.11)}
+.task-context{position:fixed;z-index:27;width:min(253px,calc(100vw - 24px));padding:7px;border:1px solid rgba(251,176,200,.24);border-radius:17px;background:rgba(47,29,45,.97);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);box-shadow:0 15px 45px rgba(0,0,0,.49);animation:contextPop .18s var(--ease-out) both;}
+.context-title{margin:5px 10px 8px;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#faafc0;font:italic 19px/1.2 var(--serif)}
+.task-context button{display:block;width:100%;border:0;border-radius:10px;padding:11px 9px;background:transparent;color:#fff0f2;text-align:left;font-size:13px;}
+.task-context button+button{border-top:1px solid rgba(255,220,230,.06)}
+.task-context button:active{background:rgba(250,149,176,.15)}
+.task-context .context-danger{color:#ff99ac}
+@keyframes contextPop{from{opacity:.4;transform:translateY(5px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.task-text{-webkit-touch-callout:none}
+/* Intentional quick composer: short form, reduced visual noise and optional time. */
+.quick-sheet{max-height:min(calc(var(--visible-height) - 14px),400px);padding-bottom:calc(17px + var(--safe-bottom));}
+#quickForm{display:flex;flex-direction:column;gap:11px;min-width:0;overflow-y:auto;padding-bottom:3px;}
+#quickTitleInput{width:100%;min-height:50px;min-width:0;padding:12px 13px;border:1px solid rgba(255,172,194,.25);border-radius:13px;background:rgba(255,255,255,.065);color:#fff2f4;font-size:16px;outline-offset:2px;}
+#quickTitleInput::placeholder{color:#ae93a3}
+.quick-presets{display:flex;gap:7px;flex-wrap:wrap;}
+.quick-presets button{flex:1 0 auto;min-height:34px;border:1px solid rgba(255,173,193,.17);border-radius:99px;background:rgba(255,255,255,.045);color:#efced9;padding:7px 11px;font-size:11px;}
+.quick-presets button.active{background:rgba(250,133,163,.23);border-color:rgba(255,175,196,.42);color:#ffeef2}
+.quick-time-label{display:flex;gap:14px;align-items:center;justify-content:space-between;margin:8px 0 0;color:#e9b8c7;font-size:12px;}
+#quickTime{width:65%;min-height:40px;padding:6px 10px;border:1px solid rgba(255,177,193,.18);border-radius:10px;background:#342333;color:#fff0f4;color-scheme:dark;font-size:16px}
+.quick-habit-note{margin:0;color:#dab7c4;font-size:12px;line-height:1.45}
+.quick-actions{display:flex;gap:10px;align-items:center;margin-top:4px;}
+.quick-actions .save-button{flex:1;min-height:43px}
+.quiet-button{border:0;background:transparent;color:#f6bac9;font-size:12px;padding:10px 6px}
+.quick-actions>*{min-width:0}
+/* Pause scheduled days without counting them as failures. */
+.pause-settings{margin-top:14px;padding:11px 12px;border:1px solid rgba(255,172,194,.14);border-radius:13px;background:rgba(255,255,255,.035)}
+.pause-head{display:flex;justify-content:space-between;align-items:center;gap:7px;color:#ffc1cf;font-size:10px;letter-spacing:.9px}
+.pause-head span+span{font-size:9px;color:#bda2af;letter-spacing:0}
+.pause-add{margin-top:12px;min-height:36px;width:100%;border:1px solid rgba(249,151,178,.22);border-radius:9px;background:rgba(242,106,149,.11);color:#f8d1da;font-size:12px}
+.pause-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,180,200,.1);font-size:11px;color:#efd1d9}
+.pause-row button{border:0;background:none;color:#f5adbf;font-size:21px;padding:0 7px}
+.reminder-hint{margin:6px 0 0;font-size:10px;color:#b99da9;line-height:1.45}
+.more-options #itemReminder{margin-bottom:3px}
+/* Enhanced analytics; compact enough for the same sheet on smaller phones. */
+.month-label{float:right;color:#be9ea9;font:400 12px/1.8 -apple-system,BlinkMacSystemFont,sans-serif}
+.heatmap-weekdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:0 0 7px;text-align:center;font-size:10px;color:#bd9caa}
+.month-heatmap{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.heatmap-day{position:relative;min-height:35px;aspect-ratio:1 / 1;border-radius:9px;border:1px solid rgba(255,200,215,.1);color:#fbe6eb;display:grid;place-items:center;font-size:12px;font-variant-numeric:tabular-nums;transition:transform .18s var(--spring),border .15s}
+.heatmap-day:active{transform:scale(.91)}
+.heatmap-day.great{background:#ef829e;color:#311526}
+.heatmap-day.good{background:#a85479}
+.heatmap-day.some{background:#603149}
+.heatmap-day.low{background:#382332;color:#dab9c6}
+.heatmap-day.empty{background:rgba(255,255,255,.036);color:#a88a98}
+.heatmap-day.selected{border:1.5px solid #ffdce5;box-shadow:0 0 0 2px rgba(247,132,165,.18)}
+.stats-footnote{margin:10px 1px 6px;color:#bb9ba9;font-size:11px;line-height:1.5}
+.habit-streak-list{display:flex;flex-direction:column;gap:6px}
+.streak-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;background:rgba(245,144,175,.07);font-size:13px;color:#f6dfe5}
+.streak-row strong{color:#ffc5d0;font-size:13px;font-weight:600}
+.streak-row small{font-weight:400;color:#bea1ae;font-size:10px}
+.setting-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 10px;border:1px solid rgba(248,153,177,.13);border-radius:12px;background:rgba(241,129,161,.06)}
+.setting-line span{display:flex;flex-direction:column;gap:4px}
+.setting-line strong{font-size:12px;font-weight:550;color:#f7d9e3}
+.setting-line small{font-size:10px;color:#b99da9}
+.setting-line input{accent-color:#fa7d99;width:19px;height:19px;flex:0 0 auto}
+.recently-deleted-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.recently-deleted-head small{font-size:9px;color:#bfa1ab}
+.trash-list{display:flex;flex-direction:column;gap:5px}
+.trash-row{display:flex;gap:9px;justify-content:space-between;align-items:center;padding:8px 11px;border-radius:10px;background:rgba(255,255,255,.04)}
+.trash-row div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.trash-row strong{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f2d7df}
+.trash-row small{font-size:10px;color:#af92a0}
+.trash-row button{border:1px solid rgba(250,155,181,.2);background:rgba(251,141,165,.1);border-radius:8px;color:#ffd0db;padding:8px 10px;font-size:11px}
+/* Refined feedback and affordance. */
+.check-circle.checked{box-shadow:0 0 0 1px rgba(255,167,193,.08)}
+.add-fab{box-shadow:0 8px 24px rgba(31,8,26,.38),inset 0 1px rgba(255,255,255,.23)}
+@media(prefers-reduced-motion:reduce){.task-context{animation:none}}
+@media(max-width:359px){.task-context{width:230px}.heatmap-day{min-height:31px;border-radius:7px}.quick-presets button{font-size:10px;padding-inline:7px}}
+
+.day-button.is-today:not(.active) .day-number::before {content:' ';position:absolute;inset:auto auto -7px 50%;width:4px;height:4px;transform:translateX(-50%);border-radius:50%;background:#fc9db4}
+.day-button.is-today:not(.active) .day-number{position:relative}
+.habit-pill.is-paused{opacity:.66;background:rgba(255,255,255,.035);border-style:dashed}
+.habit-pill.is-paused .habit-name-button{font-size:12px}
+.pause-symbol{display:grid;place-items:center;border:1px solid #d6a8b8;border-radius:50%;width:20px;height:20px;font:500 10px/1 Arial,sans-serif;color:#ecc5d0}
+
+button.streak-row{width:100%;border:1px solid rgba(250,168,190,.08);text-align:left;cursor:pointer}
+button.streak-row:active{background:rgba(245,144,175,.14)}
