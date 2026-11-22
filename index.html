@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1c0f19" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Coral Discipline" />
+  <meta name="description" content="A beautiful, private daily planner for your tasks, habits and discipline." />
+  <link rel="apple-touch-icon" href="./assets/icon-192.png" />
+  <link rel="icon" type="image/png" href="./assets/icon-192.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./app.js" defer></script>
+  <title>Coral Discipline</title>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="ocean-image" aria-hidden="true"></div>
+    <main class="content" id="app">
+      <header class="masthead">
+        <div class="date-heading">
+          <p class="today-eyebrow" id="todayEyebrow">Today</p>
+          <h1 id="largeDate">Nov 22</h1>
+          <p class="weekday-heading" id="weekdayHeading">SUNDAY</p>
+        </div>
+        <button class="discipline-button" id="disciplineButton" type="button" aria-label="Open discipline statistics">
+          <span class="discipline-ring" id="disciplineRing" style="--progress:0">
+            <span class="ring-center"><strong id="dailyPercent">0%</strong><span>DISCIPLINE</span></span>
+          </span>
+        </button>
+      </header>
+
+      <nav class="week-nav" aria-label="Choose a date">
+        <button class="week-arrow" id="prevWeek" type="button" aria-label="Previous week">‹</button>
+        <div class="week-dates" id="weekDates" aria-live="polite"></div>
+        <button class="week-arrow" id="nextWeek" type="button" aria-label="Next week">›</button>
+      </nav>
+
+      <section class="quote" aria-label="Motivational thought">
+        <span class="quote-mark" aria-hidden="true">“</span>
+        <p>Discipline today creates a calmer tomorrow.</p>
+      </section>
+
+      <section class="habits-section" aria-labelledby="habitsHeading">
+        <div class="section-header">
+          <h2 id="habitsHeading">HABITS</h2>
+          <span id="habitCount">0 / 0</span>
+        </div>
+        <div class="habit-strip" id="habitsList" aria-live="polite"></div>
+      </section>
+
+      <section class="tasks-section" aria-labelledby="tasksHeading">
+        <div class="section-header">
+          <h2 id="tasksHeading">TASKS</h2>
+          <span id="taskCount">0 TODAY</span>
+        </div>
+        <div class="tasks-list" id="tasksList" aria-live="polite"></div>
+      </section>
+      <div class="bottom-breathing-room"></div>
+    </main>
+    <button class="add-fab" id="addButton" type="button" aria-label="Add task or habit"><span aria-hidden="true">+</span></button>
+  </div>
+
+  <div class="modal-scrim" id="editorModal" hidden>
+    <section class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-title-row"><h2 id="editorTitle">New item</h2><button type="button" class="icon-close" data-close-modal aria-label="Close">×</button></div>
+      <form id="itemForm">
+        <div class="type-switch" role="group" aria-label="Item type">
+          <button type="button" id="typeTask" class="type-choice active" data-type="task">One-time task</button>
+          <button type="button" id="typeHabit" class="type-choice" data-type="habit">Repeating habit</button>
+        </div>
+        <label class="field-label" for="itemTitle">NAME</label>
+        <input id="itemTitle" name="title" type="text" placeholder="What will you accomplish?" maxlength="100" required autocomplete="off" />
+        <div class="field-row" id="taskFields">
+          <div class="field-col"><label class="field-label" for="itemDate">SCHEDULED DATE</label><input id="itemDate" name="date" type="date" required /></div>
+          <div class="field-col"><label class="field-label" for="itemTime">TIME</label><input id="itemTime" name="time" type="time" /></div>
+        </div>
+        <div id="rescheduleTools" class="reschedule-tools" hidden>
+          <p class="field-label reschedule-heading">QUICK RESCHEDULE</p>
+          <div class="reschedule-options" aria-label="Quick reschedule a task">
+            <button type="button" data-reschedule="today">Today</button>
+            <button type="button" data-reschedule="tomorrow">Tomorrow</button>
+            <button type="button" data-reschedule="next-week">Next week</button>
+          </div>
+          <p class="reschedule-hint">Or choose any date and time above. Your completed status stays the same.</p>
+        </div>
+        <div class="field-row" id="taskOptionalFields">
+          <div class="field-col"><label class="field-label" for="itemCategory">CATEGORY</label><select id="itemCategory" name="category"><option value="PERSONAL">Personal</option><option value="FOCUS">Focus</option><option value="WORK">Work</option><option value="HOME">Home</option><option value="WELLNESS">Wellness</option><option value="OTHER">Other</option></select></div>
+          <div class="field-col"><label class="field-label" for="itemDuration">DURATION (MIN)</label><input id="itemDuration" name="duration" type="number" min="0" max="1440" step="5" placeholder="Optional" /></div>
+        </div>
+        <div id="habitFields" hidden>
+          <label class="field-label" for="habitStart">FIRST DAY</label>
+          <input type="date" id="habitStart" name="startDate" />
+          <label class="field-label" for="habitFrequency">REPEAT</label>
+          <select id="habitFrequency" name="frequency"><option value="daily">Every day</option><option value="weekly">Once a week</option><option value="custom">Custom weekdays</option></select>
+          <div id="weekdayPicker" class="weekday-picker" hidden aria-label="Choose repeat weekdays"></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="danger-text" id="deleteFromEditor" hidden>Delete</button>
+          <button type="submit" class="save-button" id="saveButton">Save</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-scrim" id="statsModal" hidden>
+    <section class="modal-sheet stats-sheet" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-title-row"><h2 id="statsTitle">Your discipline</h2><button type="button" class="icon-close" data-close-modal aria-label="Close">×</button></div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <h3 class="stats-subtitle">Past 7 days</h3>
+      <div class="week-chart" id="weekChart"></div>
+      <h3 class="stats-subtitle">Milestones</h3>
+      <p class="milestones" id="milestones"></p>
+      <div class="data-actions">
+        <button type="button" id="exportData">Export backup</button>
+        <button type="button" id="importData">Import backup</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden />
+      </div>
+      <p class="privacy-note">Private by design. Everything stays on this device unless you export a backup. Clearing browser data may erase your planner.</p>
+      <button type="button" class="reset-button" id="resetData">Reset planner</button>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
