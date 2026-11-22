@@ -1,5 +1,5 @@
 {
-  "name": "Graphite Discipline — Habits & Calendar",
+  "name": "Discipline — Habits & Calendar",
   "short_name": "Discipline",
   "description": "A personal offline habits and daily calendar planner.",
   "id": "./",
@@ -11,14 +11,20 @@
   "theme_color": "#171a1f",
   "icons": [
     {
-      "src": "./assets/calendar-check-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./assets/calendar-check-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-1024.png",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
     }

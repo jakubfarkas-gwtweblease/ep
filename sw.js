@@ -1,6 +1,6 @@
 /* Small, versioned app-shell cache. Data remains in localStorage, never the service worker. */
-const CACHE = 'coral-discipline-graphite-v6-calendar-icon';
-const ASSETS = ['./', './index.html', './styles.css', './graphite.css', './app.js', './manifest.webmanifest', './assets/ocean.webp', './assets/calendar-check-180.png', './assets/calendar-check-192.png', './assets/calendar-check-512.png', './assets/calendar-check-1024.png'];
+const CACHE = 'coral-discipline-graphite-v7-home-icon';
+const ASSETS = ['./', './index.html', './styles.css', './graphite.css', './app.js', './manifest.webmanifest', './assets/ocean.webp', './assets/calendar-check-180.png', './assets/calendar-check-192.png', './assets/calendar-check-512.png', './assets/calendar-check-1024.png', './apple-touch-icon.png', './apple-touch-icon-precomposed.png', './icon-192.png', './icon-512.png', './icon-1024.png', './favicon.ico'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });

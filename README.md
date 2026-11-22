@@ -1,3 +1,15 @@
+# Graphite Discipline — V7 Home Screen icon fix
+
+**What was wrong?** The iPhone showed a default black tile with a white "D". This generally means Safari could not obtain the declared Apple touch icon at the deployed website URL or had a stale installed icon. This release places the icon in **the same folder as `index.html`**, which is where Safari can discover it by conventional filename as well as the explicit `<link rel="apple-touch-icon">`. We also version-bump icon links and the service worker cache.
+
+**Upload instructions:** Unzip this archive. Upload **all the files and the `assets` folder CONTENTS with their folder paths** to the exact SAME GitHub Pages folder containing your live `index.html`. Don't upload just the ZIP. Your published folder must include `index.html`, `apple-touch-icon.png`, `manifest.webmanifest`, `app.js`, `styles.css`, `graphite.css`, `sw.js`, and `assets/`.
+
+**Verify first:** Open `https://YOUR-LIVE-APP-URL/apple-touch-icon.png` in Safari (the icon URL relative to the `index.html` folder); it should show the silver calendar on a black background. If it shows a 404 or another picture, the upload location or Pages deployment is wrong. If it displays correctly, open the app webpage (not the icon image) and use Share → Add to Home Screen, with *Open as Web App* enabled where offered. Set name to `Discipline` and Add. If there is a previous `D` shortcut, first export your planner data (Statistics → Backup), and remove the old shortcut only after backup. On iOS the icon is usually set when adding, so replacing it often means re-adding the shortcut.
+
+**Data safety:** This package retains the `coral-discipline-v1` storage key. Changing the site URL or uninstalling the standalone app can separate or erase its local data; please export a backup first. No server or remote access was used to modify your GitHub site.
+
+---
+
 # Graphite Discipline — V6 (selected calendar + check icon)
 
 This is a **complete ready-to-deploy Graphite version** of the habits/calendar app. It retains the V4 behaviors and V5 graphite color scheme, and replaces the Home Screen icon with the user's selected metallic silver calendar/checkmark artwork. The original image was cropped into a clean square and exported to high-quality 180, 192, 512, 1024 and 2048 px PNG files.
